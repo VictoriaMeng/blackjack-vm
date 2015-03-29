@@ -1,0 +1,6 @@
+<h2>How much do you want to bet?</h2>
+<p class="money">You have: $<%= "#{session[:money]}" %></p>
+<form action="make_bet" method="post">
+    <input type="number" name="bet" />
+    <input type="submit" />
+</form>

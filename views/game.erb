@@ -1,0 +1,136 @@
+<div id="game">
+<h1>Blackjack</h1>
+<div class="profile">Current Bet: $<%= "#{session[:bet]}" %></div>
+<div class="profile">Total Cash: $<%= "#{session[:money]}" %></div>
+<h2>
+	Dealer Hand
+	<% if session[:game_state] != "player_turn" %>
+		<%= " = #{hand_total(session[:dealer_hand])}" %>
+	<% end %>
+</h2>
+<div class="cards"><% if session[:game_state] != "player_turn" %>
+	<% session[:dealer_hand].each do |card| %>
+		<%= get_image(card) %> 
+	<% end %>
+<% else %>
+	<img src='/images/cards/cover.jpg' />
+	<%= "<img src='/images/cards/#{session[:dealer_hand][1][1]}_#{session[:dealer_hand][1][0][0]}.jpg'>" %>
+<% end %>
+<% if session[:game_state] == "dealer_turn" %>
+	<form id="dealer_card" action="dealer_card" method="get">
+		<fieldset>
+			<div class="btn-group">
+				<button class="btn" name="dealer_card" value="dealer_card">Dealer draws a card...</button>
+			</div>
+		</fieldset>
+	</form>
+<% end %></div>
+<h2><%= "#{session[:player_name]}" %>'s Hand = <%= "#{hand_total(session[:player_hand])}" %></h2>
+<div class="cards"><% session[:player_hand].each do |card| %>
+	<%= get_image(card) %>
+<% end %></div>
+<br />
+<% if session[:game_state] == "player_blackjack" %>
+	<p class="result">You get Blackjack! YOU WIN!</p>
+	<p class="result">Winnings: $<%= "#{session[:bet]*1.5}" %></p>
+	<p class="result">New Total: $<%= "#{session[:money]}" %></p>
+	<br />
+	<% if session[:player_status] == "player_broke" %>
+		<p id="player_broke">You Lost All Your Money!</p>
+	<% else %>
+		<form action="play_again" method="get">
+			<div class="btn-group">
+				<button class="btn" name="play_again" value="play_again">Play Again!</button>
+			</div>
+		</form>
+	<% end %>
+<% elsif session[:game_state] == "dealer_blackjack" %>
+	<p class="result">Dealer gets Blackjack! YOU LOSE!</p>
+	<p class="result">Losses: $<%= "#{session[:bet]*1.5}" %></p>
+	<p class="result">New Total: $<%= "#{session[:money]}" %></p>
+	<br />
+	<% if session[:player_status] == "player_broke" %>
+		<p id="player_broke">You Lost All Your Money!</p>
+	<% else %>
+		<form action="play_again" method="get">
+			<div class="btn-group">
+				<button class="btn" name="play_again" value="play_again">Play Again!</button>
+			</div>
+		</form>
+	<% end %>
+<% elsif session[:game_state] == "player_bust" %>
+	<p class="result">You busted! YOU LOSE!</p>
+	<p class="result">Losses: $<%= "#{session[:bet]}" %></p>
+	<p class="result">New Total: $<%= "#{session[:money]}" %></p>
+	<br />
+	<% if session[:player_status] == "player_broke" %>
+		<p id="player_broke">You Lost All Your Money!</p>
+	<% else %>
+		<form action="play_again" method="get">
+			<div class="btn-group">
+				<button class="btn" name="play_again" value="play_again">Play Again!</button>
+			</div>
+		</form>
+	<% end %>
+<% elsif session[:game_state] == "dealer_bust" %>
+	<p class="result">Dealer busted! YOU WIN!</p>
+	<p class="result">Winnings: $<%= "#{session[:bet]}" %></p>
+	<p class="result">New Total: $<%= "#{session[:money]}" %></p>
+	<br />
+	<% if session[:player_status] == "player_broke" %>
+		<p id="player_broke">You Lost All Your Money!</p>
+	<% else %>
+		<form action="play_again" method="get">
+			<div class="btn-group">
+				<button class="btn" name="play_again" value="play_again">Play Again!</button>
+			</div>
+		</form>
+	<% end %>
+<% elsif session[:game_state] == "player_win" %>
+	<p class="result">You have <%= "#{hand_total(session[:player_hand])}" %>. Dealer has <%= "#{hand_total(session[:dealer_hand])}" %>. YOU WIN!</p>
+	<p class="result">Winnings: $<%= "#{session[:bet]}" %></p>
+	<p class="result">New Total: $<%= "#{session[:money]}" %></p>
+	<br />
+	<% if session[:player_status] == "player_broke" %>
+		<p id="player_broke">You Lost All Your Money!</p>
+	<% else %>
+		<form action="play_again" method="get">
+			<div class="btn-group">
+				<button class="btn" name="play_again" value="play_again">Play Again!</button>
+			</div>
+		</form>
+	<% end %>
+<% elsif session[:game_state] == "dealer_win" %>
+	<p class="result">You have <%= "#{hand_total(session[:player_hand])}" %>. Dealer has <%= "#{hand_total(session[:dealer_hand])}" %>. YOU LOSE!</p>
+	<p class="result">Losses: $<%= "#{session[:bet]}" %></p>
+	<p class="result">New Total: $<%= "#{session[:money]}" %></p>
+	<br />
+	<% if session[:player_status] == "player_broke" %>
+		<p id="player_broke">You Lost All Your Money!</p>
+	<% else %>
+		<form action="play_again" method="get">
+			<div class="btn-group">
+				<button class="btn" name="play_again" value="play_again">Play Again!</button>
+			</div>
+		</form>
+	<% end %>
+<% elsif session[:game_state] == "player_turn" %>
+	<form id="hit_or_stay" action="hit_or_stay" method="get">
+		<fieldset>
+			<div class="btn-group">
+				<button class="btn" name="hit_or_stay" id="hit" value="hit">Hit</button>
+				<button class="btn" name="hit_or_stay" id="stay" value="stay">Stay</button>
+			</div>
+		</fieldset>
+	</form>
+<% elsif session[:game_state] == "tie" %>
+	<div id="game_state">You have <%= "#{hand_total(session[:player_hand])}" %>. Dealer has <%= "#{hand_total(session[:dealer_hand])}" %>. IT'S A TIE!</div>
+	<br />
+	<form action="play_again" method="get">
+		<div class="btn-group">
+			<button class="btn" name="play_again" value="play_again">Play Again!</button>
+		</div>
+	</form>
+<% end %>
+</div>
+
